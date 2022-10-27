@@ -12,8 +12,6 @@ function loadAsset(name) {
 async function main() {
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-    GameManager.width = canvas.width;
-    GameManager.height = canvas.height;
 
     await Promise.all(ImageFiles.map(loadAsset));
     console.log("Assets loaded!");
@@ -22,8 +20,7 @@ async function main() {
     window.addEventListener('keydown', ev => GameManager.keyboard.set(ev.code, true));
     window.addEventListener('keyup', ev => GameManager.keyboard.set(ev.code, false));
 
-    GameManager.gameState = "playing";
-    GameManager.players.push(new Player());
+    GameManager.gameState = "menu";
 
     function animate() {
         GameManager.update();
