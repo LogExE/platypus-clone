@@ -12,15 +12,14 @@ function loadAsset(name) {
 async function main() {
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-    
-    // get current size of the canvas
+
     let rect = canvas.getBoundingClientRect();
-    // increase the actual size of our canvas
+
     canvas.width = rect.width * devicePixelRatio;
     canvas.height = rect.height * devicePixelRatio;
-    // ensure all drawing operations are scaled
+
     ctx.scale(devicePixelRatio, devicePixelRatio);
-    // scale everything down using CSS
+
     canvas.style.width = rect.width + 'px';
     canvas.style.height = rect.height + 'px';
 
@@ -40,14 +39,14 @@ async function main() {
 
 function draw(ctx) {
     switch (GameManager.gameState) {
-    case "playing":
-        drawPlaying(ctx);
-        break;
-    case "menu":
-        drawMenu(ctx);
-        break;
-    default:
-        throw new Error("Wrong gameState discovered when trying to draw!");
+        case "playing":
+            drawPlaying(ctx);
+            break;
+        case "menu":
+            drawMenu(ctx);
+            break;
+        default:
+            throw new Error("Wrong gameState discovered when trying to draw!");
     }
 }
 
@@ -57,14 +56,14 @@ function update() {
         onGameStart();
     }
     switch (GameManager.gameState) {
-    case "playing":
-        updatePlaying();
-        break;
-    case "menu":
-        updateMenu();
-        break;
-    default:
-        throw new Error("Wrong gameState discovered when trying to update!");
+        case "playing":
+            updatePlaying();
+            break;
+        case "menu":
+            updateMenu();
+            break;
+        default:
+            throw new Error("Wrong gameState discovered when trying to update!");
     }
 }
 
@@ -74,7 +73,7 @@ function drawMenu(ctx) {
     ctx.fillStyle = "#000000";
     ctx.font = "30px Georgia";
     ctx.textAlign = "center";
-    ctx.fillText("Shooter", ctx.canvas.width / 2, ctx.canvas.height / 3);
+    ctx.fillText("Shooter", ctx.canvas.width * devicePixelRatio / 2, ctx.canvas.height * devicePixelRatio / 3);
 }
 
 function updateMenu() {
