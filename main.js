@@ -73,7 +73,7 @@ function drawMenu(ctx) {
     ctx.fillStyle = "#000000";
     ctx.font = "30px Georgia";
     ctx.textAlign = "center";
-    ctx.fillText("Shooter", ctx.canvas.width * devicePixelRatio / 2, ctx.canvas.height * devicePixelRatio / 3);
+    ctx.fillText("Shooter", ctx.canvas.width / devicePixelRatio / 2, ctx.canvas.height / devicePixelRatio / 3);
 }
 
 function updateMenu() {
