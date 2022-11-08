@@ -9,32 +9,29 @@ function loadAsset(name) {
     });
 }
 
-async function main() {
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+function drawMenu(ctx) {
+    ctx.fillStyle = "#9999f0";
+    ctx.fillRect(0, 0, ctx.canvas.width / devicePixelRatio, ctx.canvas.width / devicePixelRatio);
+    ctx.fillStyle = "#000000";
+    ctx.font = "30px Georgia";
+    ctx.textAlign = "center";
+    ctx.fillText("Shooter", ctx.canvas.width / devicePixelRatio / 2, ctx.canvas.height / devicePixelRatio / 3);
+}
 
-    let rect = canvas.getBoundingClientRect();
+function updateMenu() {
 
-    canvas.width = rect.width * devicePixelRatio;
-    canvas.height = rect.height * devicePixelRatio;
+}
 
-    ctx.scale(devicePixelRatio, devicePixelRatio);
+function drawPlaying(ctx) {
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, ctx.canvas.width / devicePixelRatio, ctx.canvas.width / devicePixelRatio);
+    for (let obj of GameManager.objects)
+        obj.draw(ctx);
+}
 
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
-
-    await Promise.all(ImageFiles.map(loadAsset));
-    console.log("Assets loaded!");
-
-    window.addEventListener('keydown', ev => GameManager.keyboard.set(ev.code, true));
-    window.addEventListener('keyup', ev => GameManager.keyboard.set(ev.code, false));
-
-    function animate() {
-        update();
-        draw(ctx);
-        window.requestAnimationFrame(animate);
-    }
-    animate();
+function updatePlaying() {
+    for (let obj of GameManager.objects)
+        obj.update();
 }
 
 function draw(ctx) {
@@ -67,33 +64,42 @@ function update() {
     }
 }
 
-function drawMenu(ctx) {
-    ctx.fillStyle = "#9999f0";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = "#000000";
-    ctx.font = "30px Georgia";
-    ctx.textAlign = "center";
-    ctx.fillText("Shooter", ctx.canvas.width / devicePixelRatio / 2, ctx.canvas.height / devicePixelRatio / 3);
-}
-
-function updateMenu() {
-
-}
-
-function drawPlaying(ctx) {
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    for (let obj of GameManager.objects)
-        obj.draw(ctx);
-}
-
-function updatePlaying() {
-    for (let obj of GameManager.objects)
-        obj.update();
-}
-
 function onGameStart() {
     GameManager.objects.push(new Player(0, 0));
+}
+
+async function main() {
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    //https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas#scaling_for_high_resolution_displays
+    // Get the DPR and size of the canvas
+    const dpr = window.devicePixelRatio;
+    const rect = canvas.getBoundingClientRect();
+
+    // Set the "actual" size of the canvas
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
+    // Scale the context to ensure correct drawing operations
+    ctx.scale(dpr, dpr);
+
+    // Set the "drawn" size of the canvas
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+
+    await Promise.all(ImageFiles.map(loadAsset));
+    console.log("Assets loaded!");
+
+    window.addEventListener('keydown', ev => GameManager.keyboard.set(ev.code, true));
+    window.addEventListener('keyup', ev => GameManager.keyboard.set(ev.code, false));
+
+    function animate() {
+        update();
+        draw(ctx);
+        window.requestAnimationFrame(animate);
+    }
+    animate();
 }
 
 main();
