@@ -1,5 +1,9 @@
+'use strict';
+
 const ImageFiles = [
-    'playerShip'
+    'playerShip',
+    'bullet',
+    'ufo'
 ];
 
 const GameSettings = {
@@ -17,5 +21,6 @@ const GameManager = {
     assets: {},
     objects: [],
     keyboard: new Map(),
-    gameState: "menu"
+    gameState: "menu",
+    debug: false
 };

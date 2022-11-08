@@ -1,19 +1,22 @@
+'use strict';
+
 class Player {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
         this.v_x = 0;
         this.v_y = 0;
-        this.pic = GameManager.assets["playerShip"];
-        this.width = this.pic.width;
-        this.height = this.pic.height;
-        this.max_cd = 10;
+        this.sprite = new Sprite("playerShip", x, y);
+        this.box = this.sprite.generateCol();
+        this.max_cd = 20;
         this.cd = 0;
     }
+
     draw(ctx) {
-        ctx.drawImage(this.pic, this.x, this.y);
+        if (GameManager.debug)
+            this.box.draw(ctx);
+        this.sprite.draw(ctx);
     }
-    update() {
+
+    update(dt) {
         if (GameManager.keyboard.get(GameSettings.keyPress.right))
             this.v_x = 2;
         else if (GameManager.keyboard.get(GameSettings.keyPress.left))
@@ -28,8 +31,8 @@ class Player {
         else
             this.v_y = 0;
 
-        this.x += this.v_x;
-        this.y += this.v_y;
+        this.sprite.move(this.v_x * dt, this.v_y * dt);
+        this.box.move(this.v_x * dt, this.v_y * dt);
         if (GameManager.keyboard.get(GameSettings.keyPress.space))
             if (this.cd == 0) {
                 this.fire();
@@ -38,7 +41,8 @@ class Player {
         if (this.cd > 0)
             --this.cd;
     }
+
     fire() {
-        GameManager.objects.push(new Bullet(this.x + this.width, this.y + this.height));
+        GameManager.objects.push(new Projectile("bullet", this.box.x + this.box.w, this.box.y + this.box.h, 8, 0));
     }
 }

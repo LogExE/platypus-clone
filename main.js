@@ -1,3 +1,4 @@
+'use strict';
 
 function loadAsset(name) {
     let img = new Image();
@@ -18,7 +19,7 @@ function drawMenu(ctx) {
     ctx.fillText("Shooter", ctx.canvas.width / devicePixelRatio / 2, ctx.canvas.height / devicePixelRatio / 3);
 }
 
-function updateMenu() {
+function updateMenu(dt) {
 
 }
 
@@ -29,9 +30,9 @@ function drawPlaying(ctx) {
         obj.draw(ctx);
 }
 
-function updatePlaying() {
+function updatePlaying(dt) {
     for (let obj of GameManager.objects)
-        obj.update();
+        obj.update(dt);
 }
 
 function draw(ctx) {
@@ -47,17 +48,17 @@ function draw(ctx) {
     }
 }
 
-function update() {
+function update(dt) {
     if (GameManager.gameState == "menu" && GameManager.keyboard.get(GameSettings.keyPress.enter)) {
         GameManager.gameState = "playing";
         onGameStart();
     }
     switch (GameManager.gameState) {
         case "playing":
-            updatePlaying();
+            updatePlaying(dt);
             break;
         case "menu":
-            updateMenu();
+            updateMenu(dt);
             break;
         default:
             throw new Error("Wrong gameState discovered when trying to update!");
@@ -72,21 +73,16 @@ async function main() {
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    //https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas#scaling_for_high_resolution_displays
-    // Get the DPR and size of the canvas
     const dpr = window.devicePixelRatio;
-    const rect = canvas.getBoundingClientRect();
+    let realw = canvas.width, realh = canvas.height;
 
-    // Set the "actual" size of the canvas
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    canvas.width *= dpr;
+    canvas.height *= dpr;
 
-    // Scale the context to ensure correct drawing operations
     ctx.scale(dpr, dpr);
 
-    // Set the "drawn" size of the canvas
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
+    canvas.style.width = `${realw}px`;
+    canvas.style.height = `${realh}px`;
 
     await Promise.all(ImageFiles.map(loadAsset));
     console.log("Assets loaded!");
@@ -94,12 +90,16 @@ async function main() {
     window.addEventListener('keydown', ev => GameManager.keyboard.set(ev.code, true));
     window.addEventListener('keyup', ev => GameManager.keyboard.set(ev.code, false));
 
-    function animate() {
-        update();
+    let previousTimeStamp;
+    function animate(now) {
+        if (!previousTimeStamp)
+            previousTimeStamp = now;
+        update((now - previousTimeStamp) * 0.1);
         draw(ctx);
+        previousTimeStamp = now;
         window.requestAnimationFrame(animate);
     }
-    animate();
+    window.requestAnimationFrame(animate);
 }
 
 main();
