@@ -40,10 +40,10 @@ class Player {
                 this.cd = this.max_cd;
             }
         if (this.cd > 0)
-            --this.cd;
+            this.cd = Math.max(this.cd - 1 * dt, 0);
     }
 
     fire() {
-        GameManager.objects.push(new Projectile("bullet", this.box.x + this.box.w, this.box.y + this.box.h, 8, 0));
+        GameManager.projectiles.push(new Projectile(this, "bullet", this.box.x + this.box.w, this.box.y + this.box.h, 8, 0));
     }
 }

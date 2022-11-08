@@ -1,13 +1,17 @@
 'use strict';
 
-function loadAsset(name) {
+function loadImage(name) {
     let img = new Image();
-    let fileName = 'assets/' + name + '.png';
+    let fileName = 'assets/img/' + name + '.png';
 
     return new Promise(res => {
         img.src = fileName;
         img.onload = () => res(GameManager.assets[name] = img);
     });
+}
+
+function loadAudio(name) {
+    
 }
 
 function drawMenu(ctx) {
@@ -28,11 +32,23 @@ function drawPlaying(ctx) {
     ctx.fillRect(0, 0, ctx.canvas.width / devicePixelRatio, ctx.canvas.width / devicePixelRatio);
     for (let obj of GameManager.objects)
         obj.draw(ctx);
+    for (let proj of GameManager.projectiles)
+        proj.draw(ctx);
 }
 
 function updatePlaying(dt) {
+    GameManager.objects.forEach((obj, i) => {
+        GameManager.projectiles.forEach((proj, j) => {
+            if (obj != proj.whoFired && obj.box.testCol(proj.box)) {
+                GameManager.objects.splice(i, 1);
+                GameManager.projectiles.splice(j, 1);
+            }
+        });
+    });
     for (let obj of GameManager.objects)
         obj.update(dt);
+    for (let proj of GameManager.projectiles)
+        proj.update(dt);
 }
 
 function draw(ctx) {
@@ -84,11 +100,13 @@ async function main() {
     canvas.style.width = `${realw}px`;
     canvas.style.height = `${realh}px`;
 
-    await Promise.all(ImageFiles.map(loadAsset));
+    await Promise.all(ImageFiles.map(loadImage));
     console.log("Assets loaded!");
 
     window.addEventListener('keydown', ev => GameManager.keyboard.set(ev.code, true));
     window.addEventListener('keyup', ev => GameManager.keyboard.set(ev.code, false));
+
+    canvas.addEventListener('mousedown', ev => GameManager.objects.push(new EnemyUFO(ev.clientX, ev.clientY)));
 
     let previousTimeStamp;
     function animate(now) {

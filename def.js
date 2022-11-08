@@ -6,6 +6,10 @@ const ImageFiles = [
     'ufo'
 ];
 
+const SoundFiles = [
+    'explosion'
+];
+
 const GameSettings = {
     keyPress: {
         left: "KeyA",
@@ -20,6 +24,7 @@ const GameSettings = {
 const GameManager = {
     assets: {},
     objects: [],
+    projectiles: [],
     keyboard: new Map(),
     gameState: "menu",
     debug: false

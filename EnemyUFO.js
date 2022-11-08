@@ -7,7 +7,7 @@ class EnemyUFO {
         this.v_y = 0;
         this.sprite = new Sprite("ufo", x, y);
         this.box = this.sprite.generateCol();
-        this.max_cd = 250;
+        this.max_cd = 200;
         this.cd = 0;
         this.timer = 0;
     }
@@ -27,11 +27,11 @@ class EnemyUFO {
             this.cd = this.max_cd;
         }
         if (this.cd > 0)
-            --this.cd;
-        ++this.timer;
+            this.cd = Math.max(this.cd - 1 * dt, 0);
+        this.timer += 1 * dt;
     }
 
     fire() {
-        GameManager.objects.push(new Projectile("bullet", this.box.x, this.box.y + this.box.h, -4, 0));
+        GameManager.projectiles.push(new Projectile(this, "bullet", this.box.x, this.box.y + this.box.h, -4, 0));
     }
 }
