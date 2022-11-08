@@ -1,8 +1,9 @@
 'use strict';
 
 class EnemyUFO {
+    static SPEED = 3;
     constructor(x, y) {
-        this.v_x = -2;
+        this.v_x = -EnemyUFO.SPEED;
         this.v_y = 0;
         this.sprite = new Sprite("ufo", x, y);
         this.box = this.sprite.generateCol();

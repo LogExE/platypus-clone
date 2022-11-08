@@ -1,6 +1,7 @@
 'use strict';
 
 class Player {
+    static SPEED = 4;
     constructor(x, y) {
         this.v_x = 0;
         this.v_y = 0;
@@ -18,16 +19,16 @@ class Player {
 
     update(dt) {
         if (GameManager.keyboard.get(GameSettings.keyPress.right))
-            this.v_x = 2;
+            this.v_x = Player.SPEED;
         else if (GameManager.keyboard.get(GameSettings.keyPress.left))
-            this.v_x = -2;
+            this.v_x = -Player.SPEED;
         else
             this.v_x = 0;
 
         if (GameManager.keyboard.get(GameSettings.keyPress.up))
-            this.v_y = -2;
+            this.v_y = -Player.SPEED;
         else if (GameManager.keyboard.get(GameSettings.keyPress.down))
-            this.v_y = 2;
+            this.v_y = Player.SPEED;
         else
             this.v_y = 0;
 
