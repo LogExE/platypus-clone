@@ -29,3 +29,8 @@ class EnemyUFO {
             --this.cd;
         ++this.timer;
     }
+
+    fire() {
+        GameManager.objects.push(new Projectile("bullet", this.box.x, this.box.y + this.box.h, -4, 0));
+    }
+}
