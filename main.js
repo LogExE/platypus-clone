@@ -2,16 +2,17 @@
 
 function loadImage(name) {
     let img = new Image();
-    let fileName = 'assets/img/' + name + '.png';
 
     return new Promise(res => {
-        img.src = fileName;
+        img.src = 'assets/img/' + name + '.png';
         img.onload = () => res([name, img]);
     });
 }
 
-function loadAudio(name) {
-
+function playAudio(name) {
+    let aud = new Audio('assets/snd/' + name + '.ogg');
+    aud.volume = 0.1;
+    aud.play();
 }
 
 function drawMenu(ctx) {
@@ -50,17 +51,20 @@ function drawPlaying(objects, images, ctx) {
 
 function updatePlaying(dt, objects, keyboard) {
     let spawn = x => objects.add(x);
-    for (let obj of objects)
+    for (let obj of objects) {
+        let perish = () => objects.delete(obj);
         if (obj instanceof Player) {
-            obj.update(dt, spawn, keyboard);
+            obj.update(dt, { perish, spawn, playAudio }, keyboard);
         }
         else
-            obj.update(dt, spawn);
+            obj.update(dt, { perish, spawn, playAudio });
+    }
+
     for (let obj1 of objects)
         for (let obj2 of objects)
             if (obj1 != obj2 && obj1.box.testCol(obj2.box)) {
-                obj1.hit(obj2, () => objects.delete(obj1));
-                obj2.hit(obj1, () => objects.delete(obj2));
+                obj1.hit(obj2, { perish: () => objects.delete(obj1), spawn, playAudio });
+                obj2.hit(obj1, { perish: () => objects.delete(obj2), spawn, playAudio });
             }
 }
 
@@ -119,7 +123,7 @@ async function main() {
     window.addEventListener('keydown', ev => gameManager.keyboard.set(ev.code, true));
     window.addEventListener('keyup', ev => gameManager.keyboard.set(ev.code, false));
 
-    canvas.addEventListener('mousedown', ev => gameManager.objects.add(new EnemyUFO(ev.clientX, ev.clientY)));
+    canvas.addEventListener('mousedown', ev => gameManager.objects.add(new EnemyUFO(ev.offsetX, ev.offsetY)));
 
     console.log(gameManager);
 

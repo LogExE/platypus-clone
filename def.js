@@ -6,9 +6,11 @@ const ImageFiles = [
     'ufo'
 ];
 
-const SoundFiles = [
-    'explosion'
-];
+const Sound = {
+    explosion: 'explosion-small',
+    bigexplosion: 'explosion-big',
+    shot: 'shot-1'
+};
 
 const GameSettings = {
     keyPress: {
@@ -19,5 +21,5 @@ const GameSettings = {
         space: "Space",
         enter: "Enter"
     },
-    debug: false
+    debug: true
 }

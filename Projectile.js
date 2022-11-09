@@ -7,12 +7,15 @@ class Projectile {
         this.v_y = v_y;
         this.whoFired = whoFired;
     }
-    update(dt) {
-        this.box.move(this.v_x * dt, this.v_y * dt);
+
+    hit(obj, { perish, spawn, playAudio }) {
+        if (!(obj instanceof Projectile) && this.whoFired != obj) {
+            playAudio(Sound.explosion);
+            perish();
+        }
     }
 
-    hit(obj, perish) {
-        if (obj != this.whoFired)
-            perish();
+    update(dt, { perish, spawn, playAudio }) {
+        this.box.move(this.v_x * dt, this.v_y * dt);
     }
 }
