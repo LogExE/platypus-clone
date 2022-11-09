@@ -6,12 +6,12 @@ function loadImage(name) {
 
     return new Promise(res => {
         img.src = fileName;
-        img.onload = () => res(GameManager.assets[name] = img);
+        img.onload = () => res([name, img]);
     });
 }
 
 function loadAudio(name) {
-    
+
 }
 
 function drawMenu(ctx) {
@@ -27,34 +27,47 @@ function updateMenu(dt) {
 
 }
 
-function drawPlaying(ctx) {
+function drawPlaying(objects, images, ctx) {
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, ctx.canvas.width / devicePixelRatio, ctx.canvas.width / devicePixelRatio);
-    for (let obj of GameManager.objects)
-        obj.draw(ctx);
-    for (let proj of GameManager.projectiles)
-        proj.draw(ctx);
+    for (let obj of objects) {
+        if (GameSettings.debug && obj.box) {
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+        }
+        if (obj instanceof Player) {
+            ctx.drawImage(images.get("playerShip"), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+        }
+        else if (obj instanceof Projectile) {
+            ctx.drawImage(images.get("bullet"), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+        }
+        else if (obj instanceof EnemyUFO) {
+            ctx.drawImage(images.get("ufo"), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+        }
+        else throw new Error("Tried to draw unknown object!");
+    }
 }
 
-function updatePlaying(dt) {
-    GameManager.objects.forEach((obj, i) => {
-        GameManager.projectiles.forEach((proj, j) => {
-            if (obj != proj.whoFired && obj.box.testCol(proj.box)) {
-                GameManager.objects.splice(i, 1);
-                GameManager.projectiles.splice(j, 1);
+function updatePlaying(dt, objects, keyboard) {
+    let spawn = x => objects.add(x);
+    for (let obj of objects)
+        if (obj instanceof Player) {
+            obj.update(dt, spawn, keyboard);
+        }
+        else
+            obj.update(dt, spawn);
+    for (let obj1 of objects)
+        for (let obj2 of objects)
+            if (obj1 != obj2 && obj1.box.testCol(obj2.box)) {
+                obj1.hit(obj2, () => objects.delete(obj1));
+                obj2.hit(obj1, () => objects.delete(obj2));
             }
-        });
-    });
-    for (let obj of GameManager.objects)
-        obj.update(dt);
-    for (let proj of GameManager.projectiles)
-        proj.update(dt);
 }
 
-function draw(ctx) {
-    switch (GameManager.gameState) {
+function draw(gameManager, ctx) {
+    switch (gameManager.state) {
         case "playing":
-            drawPlaying(ctx);
+            drawPlaying(gameManager.objects, gameManager.images, ctx);
             break;
         case "menu":
             drawMenu(ctx);
@@ -64,14 +77,14 @@ function draw(ctx) {
     }
 }
 
-function update(dt) {
-    if (GameManager.gameState == "menu" && GameManager.keyboard.get(GameSettings.keyPress.enter)) {
-        GameManager.gameState = "playing";
-        onGameStart();
+function update(gameManager, dt) {
+    if (gameManager.state == "menu" && gameManager.keyboard.get(GameSettings.keyPress.enter)) {
+        gameManager.state = "playing";
+        gameManager.objects.add(new Player(0, 0));
     }
-    switch (GameManager.gameState) {
+    switch (gameManager.state) {
         case "playing":
-            updatePlaying(dt);
+            updatePlaying(dt, gameManager.objects, gameManager.keyboard);
             break;
         case "menu":
             updateMenu(dt);
@@ -81,39 +94,41 @@ function update(dt) {
     }
 }
 
-function onGameStart() {
-    GameManager.objects.push(new Player(0, 0));
-}
-
 async function main() {
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
+    const gameManager = {
+        images: null,
+        objects: new Set(),
+        keyboard: new Map(),
+        state: "menu"
+    };
 
     const dpr = window.devicePixelRatio;
     let realw = canvas.width, realh = canvas.height;
-
     canvas.width *= dpr;
     canvas.height *= dpr;
-
     ctx.scale(dpr, dpr);
-
     canvas.style.width = `${realw}px`;
     canvas.style.height = `${realh}px`;
 
-    await Promise.all(ImageFiles.map(loadImage));
+    let imgs = await Promise.all(ImageFiles.map(loadImage));
     console.log("Assets loaded!");
+    gameManager.images = new Map(imgs);
 
-    window.addEventListener('keydown', ev => GameManager.keyboard.set(ev.code, true));
-    window.addEventListener('keyup', ev => GameManager.keyboard.set(ev.code, false));
+    window.addEventListener('keydown', ev => gameManager.keyboard.set(ev.code, true));
+    window.addEventListener('keyup', ev => gameManager.keyboard.set(ev.code, false));
 
-    canvas.addEventListener('mousedown', ev => GameManager.objects.push(new EnemyUFO(ev.clientX, ev.clientY)));
+    canvas.addEventListener('mousedown', ev => gameManager.objects.add(new EnemyUFO(ev.clientX, ev.clientY)));
+
+    console.log(gameManager);
 
     let previousTimeStamp;
     function animate(now) {
         if (!previousTimeStamp)
             previousTimeStamp = now;
-        update((now - previousTimeStamp) * 0.1);
-        draw(ctx);
+        update(gameManager, (now - previousTimeStamp) * 0.1);
+        draw(gameManager, ctx);
         previousTimeStamp = now;
         window.requestAnimationFrame(animate);
     }

@@ -19,13 +19,5 @@ const GameSettings = {
         space: "Space",
         enter: "Enter"
     },
-}
-
-const GameManager = {
-    assets: {},
-    objects: [],
-    projectiles: [],
-    keyboard: new Map(),
-    gameState: "menu",
     debug: false
-};
+}
