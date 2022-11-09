@@ -2,7 +2,6 @@
 
 class Projectile {
     constructor(whoFired, x, y, v_x, v_y) {
-        this.box = new CollisionBox(x, y, 50, 30);
         this.v_x = v_x;
         this.v_y = v_y;
         this.whoFired = whoFired;
@@ -17,5 +16,19 @@ class Projectile {
 
     update(dt, { perish, spawn, playAudio }) {
         this.box.move(this.v_x * dt, this.v_y * dt);
+    }
+}
+
+class SmallProjectile extends Projectile {
+    constructor(whoFired, x, y, v_x, v_y) {
+        super(whoFired, x, y, v_x, v_y)
+        this.box = new CollisionBox(x, y, 50, 50);
+    }
+}
+
+class DefaultProjectile extends Projectile {
+    constructor(whoFired, x, y, v_x, v_y) {
+        super(whoFired, x, y, v_x, v_y)
+        this.box = new CollisionBox(x, y, 100, 60);
     }
 }

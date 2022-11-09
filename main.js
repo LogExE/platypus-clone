@@ -28,7 +28,7 @@ function updateMenu(dt) {
 
 }
 
-function drawPlaying(objects, images, ctx) {
+function drawPlaying(objects, textures, ctx) {
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, ctx.canvas.width / devicePixelRatio, ctx.canvas.width / devicePixelRatio);
     for (let obj of objects) {
@@ -37,13 +37,16 @@ function drawPlaying(objects, images, ctx) {
             ctx.fillRect(obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         if (obj instanceof Player) {
-            ctx.drawImage(images.get("playerShip"), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+            ctx.drawImage(textures.get(Texture.player), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
-        else if (obj instanceof Projectile) {
-            ctx.drawImage(images.get("bullet"), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+        else if (obj instanceof DefaultProjectile) {
+            ctx.drawImage(textures.get(Texture.defProjectile), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+        }
+        else if (obj instanceof SmallProjectile) {
+            ctx.drawImage(textures.get(Texture.smolProjectile), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         else if (obj instanceof EnemyUFO) {
-            ctx.drawImage(images.get("ufo"), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+            ctx.drawImage(textures.get(Texture.ufo), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         else throw new Error("Tried to draw unknown object!");
     }
@@ -71,7 +74,7 @@ function updatePlaying(dt, objects, keyboard) {
 function draw(gameManager, ctx) {
     switch (gameManager.state) {
         case "playing":
-            drawPlaying(gameManager.objects, gameManager.images, ctx);
+            drawPlaying(gameManager.objects, gameManager.textures, ctx);
             break;
         case "menu":
             drawMenu(ctx);
@@ -85,6 +88,10 @@ function update(gameManager, dt) {
     if (gameManager.state == "menu" && gameManager.keyboard.get(GameSettings.keyPress.enter)) {
         gameManager.state = "playing";
         gameManager.objects.add(new Player(0, 0));
+        setTimeout(function addUFOs() {
+            gameManager.objects.add(new EnemyUFO(SCREEN_WIDTH, Math.random() * SCREEN_HEIGHT));
+            setTimeout(addUFOs, SCREEN_HEIGHT / 2 + Math.random() * SCREEN_HEIGHT);
+        }, 2500);
     }
     switch (gameManager.state) {
         case "playing":
@@ -102,7 +109,7 @@ async function main() {
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
     const gameManager = {
-        images: null,
+        textures: null,
         objects: new Set(),
         keyboard: new Map(),
         state: "menu"
@@ -116,16 +123,12 @@ async function main() {
     canvas.style.width = `${realw}px`;
     canvas.style.height = `${realh}px`;
 
-    let imgs = await Promise.all(ImageFiles.map(loadImage));
+    let txtrs = await Promise.all(Object.values(Texture).map(loadImage));
     console.log("Assets loaded!");
-    gameManager.images = new Map(imgs);
+    gameManager.textures = new Map(txtrs);
 
     window.addEventListener('keydown', ev => gameManager.keyboard.set(ev.code, true));
     window.addEventListener('keyup', ev => gameManager.keyboard.set(ev.code, false));
-
-    canvas.addEventListener('mousedown', ev => gameManager.objects.add(new EnemyUFO(ev.offsetX, ev.offsetY)));
-
-    console.log(gameManager);
 
     let previousTimeStamp;
     function animate(now) {

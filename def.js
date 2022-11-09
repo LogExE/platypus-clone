@@ -1,15 +1,19 @@
 'use strict';
 
-const ImageFiles = [
-    'playerShip',
-    'bullet',
-    'ufo'
-];
+const SCREEN_WIDTH = 2000, SCREEN_HEIGHT = 1000;
+
+const Texture = {
+    player: 'playerShip',
+    defProjectile: 'bullet',
+    smolProjectile: 'projsmall',
+    ufo: 'ufo'
+};
 
 const Sound = {
     explosion: 'explosion-small',
     bigexplosion: 'explosion-big',
-    shot: 'shot-1'
+    shot: 'shot-1',
+    enemyshot: 'laser small'
 };
 
 const GameSettings = {
@@ -21,5 +25,5 @@ const GameSettings = {
         space: "Space",
         enter: "Enter"
     },
-    debug: true
+    debug: false
 }
