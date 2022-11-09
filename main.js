@@ -17,11 +17,11 @@ function playAudio(name) {
 
 function drawMenu(ctx) {
     ctx.fillStyle = "#9999f0";
-    ctx.fillRect(0, 0, ctx.canvas.width / devicePixelRatio, ctx.canvas.width / devicePixelRatio);
+    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     ctx.fillStyle = "#000000";
     ctx.font = "30px Georgia";
     ctx.textAlign = "center";
-    ctx.fillText("Shooter", ctx.canvas.width / devicePixelRatio / 2, ctx.canvas.height / devicePixelRatio / 3);
+    ctx.fillText("Shooter", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
 }
 
 function updateMenu(dt) {
@@ -30,7 +30,7 @@ function updateMenu(dt) {
 
 function drawPlaying(objects, textures, ctx) {
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, ctx.canvas.width / devicePixelRatio, ctx.canvas.width / devicePixelRatio);
+    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     for (let obj of objects) {
         if (GameSettings.debug && obj.box) {
             ctx.fillStyle = '#FF0000';
@@ -72,6 +72,8 @@ function updatePlaying(dt, objects, keyboard) {
 }
 
 function draw(gameManager, ctx) {
+    ctx.save();
+    ctx.scale(ctx.canvas.width / SCREEN_WIDTH, ctx.canvas.height / SCREEN_HEIGHT);
     switch (gameManager.state) {
         case "playing":
             drawPlaying(gameManager.objects, gameManager.textures, ctx);
@@ -82,15 +84,16 @@ function draw(gameManager, ctx) {
         default:
             throw new Error("Wrong gameState discovered when trying to draw!");
     }
+    ctx.restore();
 }
 
 function update(gameManager, dt) {
     if (gameManager.state == "menu" && gameManager.keyboard.get(GameSettings.keyPress.enter)) {
         gameManager.state = "playing";
-        gameManager.objects.add(new Player(0, 0));
+        gameManager.objects.add(new Player(10, SCREEN_HEIGHT / 2));
         setTimeout(function addUFOs() {
             gameManager.objects.add(new EnemyUFO(SCREEN_WIDTH, Math.random() * SCREEN_HEIGHT));
-            setTimeout(addUFOs, SCREEN_HEIGHT / 2 + Math.random() * SCREEN_HEIGHT);
+            setTimeout(addUFOs, 500 + Math.random() * 5000);
         }, 2500);
     }
     switch (gameManager.state) {
@@ -107,6 +110,8 @@ function update(gameManager, dt) {
 
 async function main() {
     const canvas = document.getElementById("gameCanvas");
+    canvas.width = document.body.clientWidth;
+    canvas.height = document.body.clientHeight;
     const ctx = canvas.getContext("2d");
     const gameManager = {
         textures: null,
@@ -115,13 +120,13 @@ async function main() {
         state: "menu"
     };
 
-    const dpr = window.devicePixelRatio;
-    let realw = canvas.width, realh = canvas.height;
-    canvas.width *= dpr;
-    canvas.height *= dpr;
-    ctx.scale(dpr, dpr);
-    canvas.style.width = `${realw}px`;
-    canvas.style.height = `${realh}px`;
+    // const dpr = window.devicePixelRatio;
+    // let realw = canvas.width, realh = canvas.height;
+    // canvas.width *= dpr;
+    // canvas.height *= dpr;
+    // ctx.scale(dpr, dpr);
+    // canvas.style.width = `${realw}px`;
+    // canvas.style.height = `${realh}px`;
 
     let txtrs = await Promise.all(Object.values(Texture).map(loadImage));
     console.log("Assets loaded!");

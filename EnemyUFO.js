@@ -2,8 +2,8 @@
 
 class EnemyUFO {
     static SPEED = 3;
-    static WIDTH = 160;
-    static HEIGHT = 80;
+    static WIDTH = 120;
+    static HEIGHT = 60;
     constructor(x, y) {
         this.v_x = -EnemyUFO.SPEED;
         this.v_y = 0;
@@ -24,6 +24,12 @@ class EnemyUFO {
     update(dt, { perish, spawn, playAudio }) {
         this.v_y = Math.cos(this.timer / 100);
         this.box.move(this.v_x * dt, this.v_y * dt);
+
+        if (this.box.x + this.box.w < 0)
+        {
+            perish();
+            return;
+        }
 
         if (this.cd == 0) {
             spawn(new SmallProjectile(this, this.box.x, this.box.y + this.box.h, -4, 0));

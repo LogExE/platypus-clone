@@ -2,8 +2,8 @@
 
 class Player {
     static SPEED = 4;
-    static WIDTH = 200;
-    static HEIGHT = 140;
+    static WIDTH = 150;
+    static HEIGHT = 70;
     constructor(x, y) {
         this.v_x = 0;
         this.v_y = 0;
@@ -20,16 +20,16 @@ class Player {
     }
 
     update(dt, { perish, spawn, playAudio }, keyboard) {
-        if (keyboard.get(GameSettings.keyPress.right))
+        if (keyboard.get(GameSettings.keyPress.right) && this.box.x + this.box.w < SCREEN_WIDTH)
             this.v_x = Player.SPEED;
-        else if (keyboard.get(GameSettings.keyPress.left))
+        else if (keyboard.get(GameSettings.keyPress.left) && this.box.x > 0)
             this.v_x = -Player.SPEED;
         else
             this.v_x = 0;
 
-        if (keyboard.get(GameSettings.keyPress.up))
+        if (keyboard.get(GameSettings.keyPress.up) && this.box.y > 0)
             this.v_y = -Player.SPEED;
-        else if (keyboard.get(GameSettings.keyPress.down))
+        else if (keyboard.get(GameSettings.keyPress.down) && this.box.y + this.box.h < SCREEN_HEIGHT)
             this.v_y = Player.SPEED;
         else
             this.v_y = 0;
