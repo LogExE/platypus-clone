@@ -59,7 +59,7 @@ function drawPlaying(objects, textures, ctx) {
         ctx.textAlign = "left";
         let text = "Score: " + score + " ";
         let sz = ctx.measureText(text);
-        ctx.fillText(text, x, sz.fontBoundingBoxAscent + sz.fontBoundingBoxDescent);
+        ctx.fillText(text, x, sz.actualBoundingBoxAscent + sz.actualBoundingBoxDescent);
         x += sz.width;
     }
 }
