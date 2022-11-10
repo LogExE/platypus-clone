@@ -136,6 +136,11 @@ async function main() {
     let resize = () => {
         canvas.width = document.body.clientWidth;
         canvas.height = document.body.clientHeight;
+	let realw = canvas.width, realh = canvas.height;
+	canvas.width *= window.devicePixelRatio;
+	canvas.height *= window.devicePixelRatio;
+	canvas.style.width = `${realw}px`;
+	canvas.style.height = `${realh}px`;
     };
     resize();
     window.addEventListener("resize", resize);
@@ -148,14 +153,6 @@ async function main() {
     };
     let inpHandler = new KeyboardInputHandler();
     gameManager.inputHandlers.primary = inpHandler;
-
-    // const dpr = window.devicePixelRatio;
-    // let realw = canvas.width, realh = canvas.height;
-    // canvas.width *= dpr;
-    // canvas.height *= dpr;
-    // ctx.scale(dpr, dpr);
-    // canvas.style.width = `${realw}px`;
-    // canvas.style.height = `${realh}px`;
 
     let txtrs = await Promise.all(Object.values(Texture).map(loadImage));
     console.log("Assets loaded!");
