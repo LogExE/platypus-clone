@@ -25,5 +25,10 @@ const GameSettings = {
         space: "Space",
         enter: "Enter"
     },
+    gamepadMappings: {
+        a: 0,
+        horizontal: 0,
+        vertical: 1
+    },
     debug: false
 }

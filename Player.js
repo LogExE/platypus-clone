@@ -10,6 +10,7 @@ class Player {
         this.box = new CollisionBox(x, y, Player.WIDTH, Player.HEIGHT);
         this.max_cd = 20;
         this.cd = 0;
+        this.score = 0;
     }
 
     hit(obj, { perish, spawn, playAudio }) {
@@ -19,23 +20,13 @@ class Player {
         }
     }
 
-    update(dt, { perish, spawn, playAudio }, keyboard) {
-        if (keyboard.get(GameSettings.keyPress.right) && this.box.x + this.box.w < SCREEN_WIDTH)
-            this.v_x = Player.SPEED;
-        else if (keyboard.get(GameSettings.keyPress.left) && this.box.x > 0)
-            this.v_x = -Player.SPEED;
-        else
-            this.v_x = 0;
+    update(dt, { perish, spawn, playAudio }, input) {
+        this.v_x = input.get("horizontal") * Player.SPEED;
+        this.v_y = input.get("vertical") * Player.SPEED;
+        this.box.x = Math.max(0, Math.min(this.box.x + this.v_x * dt, SCREEN_WIDTH - this.box.w));
+        this.box.y = Math.max(0, Math.min(this.box.y + this.v_y * dt, SCREEN_HEIGHT - this.box.h));
 
-        if (keyboard.get(GameSettings.keyPress.up) && this.box.y > 0)
-            this.v_y = -Player.SPEED;
-        else if (keyboard.get(GameSettings.keyPress.down) && this.box.y + this.box.h < SCREEN_HEIGHT)
-            this.v_y = Player.SPEED;
-        else
-            this.v_y = 0;
-        this.box.move(this.v_x * dt, this.v_y * dt);
-
-        if (keyboard.get(GameSettings.keyPress.space))
+        if (input.get("space"))
             if (this.cd == 0) {
                 spawn(new DefaultProjectile(this, this.box.x + this.box.w, this.box.y + this.box.h, 8, 0));
                 playAudio(Sound.shot);

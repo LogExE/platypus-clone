@@ -31,12 +31,14 @@ function updateMenu(dt) {
 function drawPlaying(objects, textures, ctx) {
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    let scores = [];
     for (let obj of objects) {
         if (GameSettings.debug && obj.box) {
             ctx.fillStyle = '#FF0000';
             ctx.fillRect(obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         if (obj instanceof Player) {
+            scores.push(obj.score);
             ctx.drawImage(textures.get(Texture.player), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         else if (obj instanceof DefaultProjectile) {
@@ -50,14 +52,24 @@ function drawPlaying(objects, textures, ctx) {
         }
         else throw new Error("Tried to draw unknown object!");
     }
+    let x = 10;
+    for (let score of scores) {
+        ctx.fillStyle = "#000000";
+        ctx.font = "30px Georgia";
+        ctx.textAlign = "left";
+        let text = "Score: " + score + " ";
+        let sz = ctx.measureText(text);
+        ctx.fillText(text, x, sz.fontBoundingBoxAscent + sz.fontBoundingBoxDescent);
+        x += sz.width;
+    }
 }
 
-function updatePlaying(dt, objects, keyboard) {
+function updatePlaying(dt, objects, inputHandlers) {
     let spawn = x => objects.add(x);
     for (let obj of objects) {
         let perish = () => objects.delete(obj);
         if (obj instanceof Player) {
-            obj.update(dt, { perish, spawn, playAudio }, keyboard);
+            obj.update(dt, { perish, spawn, playAudio }, inputHandlers.inputs.get(obj));
         }
         else
             obj.update(dt, { perish, spawn, playAudio });
@@ -88,9 +100,20 @@ function draw(gameManager, ctx) {
 }
 
 function update(gameManager, dt) {
-    if (gameManager.state == "menu" && gameManager.keyboard.get(GameSettings.keyPress.enter)) {
+    if (gameManager.state == "menu" && gameManager.inputHandlers.primary.get("enter")) {
         gameManager.state = "playing";
-        gameManager.objects.add(new Player(10, SCREEN_HEIGHT / 2));
+        let plr = new Player(10, SCREEN_HEIGHT / 2);
+        gameManager.objects.add(plr);
+        gameManager.inputHandlers.inputs.set(plr, gameManager.inputHandlers.primary);
+        window.addEventListener("gamepadconnected", (e) => {
+            let newplr = new Player(10, SCREEN_HEIGHT / 2);
+            gameManager.objects.add(newplr);
+            gameManager.inputHandlers.inputs.set(newplr, new GamepadInputHandler(e.gamepad.index));
+        });
+        window.addEventListener("gamepaddisconnected", (e) => {
+            console.log("Gamepad disconnected from index %d: %s",
+                e.gamepad.index, e.gamepad.id);
+        });
         setTimeout(function addUFOs() {
             gameManager.objects.add(new EnemyUFO(SCREEN_WIDTH, Math.random() * SCREEN_HEIGHT));
             setTimeout(addUFOs, 500 + Math.random() * 5000);
@@ -98,7 +121,7 @@ function update(gameManager, dt) {
     }
     switch (gameManager.state) {
         case "playing":
-            updatePlaying(dt, gameManager.objects, gameManager.keyboard);
+            updatePlaying(dt, gameManager.objects, gameManager.inputHandlers);
             break;
         case "menu":
             updateMenu(dt);
@@ -110,15 +133,21 @@ function update(gameManager, dt) {
 
 async function main() {
     const canvas = document.getElementById("gameCanvas");
-    canvas.width = document.body.clientWidth;
-    canvas.height = document.body.clientHeight;
+    let resize = () => {
+        canvas.width = document.body.clientWidth;
+        canvas.height = document.body.clientHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
     const ctx = canvas.getContext("2d");
     const gameManager = {
         textures: null,
         objects: new Set(),
-        keyboard: new Map(),
-        state: "menu"
+        inputHandlers: { primary: null, inputs: new Map() },
+        state: "menu",
     };
+    let inpHandler = new KeyboardInputHandler();
+    gameManager.inputHandlers.primary = inpHandler;
 
     // const dpr = window.devicePixelRatio;
     // let realw = canvas.width, realh = canvas.height;
@@ -131,9 +160,6 @@ async function main() {
     let txtrs = await Promise.all(Object.values(Texture).map(loadImage));
     console.log("Assets loaded!");
     gameManager.textures = new Map(txtrs);
-
-    window.addEventListener('keydown', ev => gameManager.keyboard.set(ev.code, true));
-    window.addEventListener('keyup', ev => gameManager.keyboard.set(ev.code, false));
 
     let previousTimeStamp;
     function animate(now) {

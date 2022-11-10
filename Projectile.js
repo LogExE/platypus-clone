@@ -9,13 +9,16 @@ class Projectile {
 
     hit(obj, { perish, spawn, playAudio }) {
         if (!(obj instanceof Projectile) && this.whoFired != obj) {
+            if (this.whoFired.score !== undefined)
+                this.whoFired.score += 500;
             playAudio(Sound.explosion);
             perish();
         }
     }
 
     update(dt, { perish, spawn, playAudio }) {
-        this.box.move(this.v_x * dt, this.v_y * dt);
+        this.box.x += this.v_x * dt
+        this.box.y += this.v_y * dt;
         if (this.box.x + this.box.h < 0 || this.box.x > SCREEN_WIDTH || this.box.y + this.box.h < 0 || this.box.y > SCREEN_HEIGHT)
             perish();
     }

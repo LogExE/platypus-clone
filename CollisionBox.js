@@ -11,9 +11,4 @@ class CollisionBox {
     testCol(anotherBox) {
         return this.x <= anotherBox.x + anotherBox.w && this.x + this.w >= anotherBox.x && this.y <= anotherBox.y + anotherBox.h && this.y + this.h >= anotherBox.y;
     }
-
-    move(dx, dy) {
-        this.x += dx;
-        this.y += dy;
-    }
 }

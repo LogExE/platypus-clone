@@ -23,7 +23,8 @@ class EnemyUFO {
 
     update(dt, { perish, spawn, playAudio }) {
         this.v_y = Math.cos(this.timer / 100);
-        this.box.move(this.v_x * dt, this.v_y * dt);
+        this.box.x += this.v_x * dt
+        this.box.y += this.v_y * dt;
 
         if (this.box.x + this.box.w < 0)
         {
