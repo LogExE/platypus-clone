@@ -21,8 +21,9 @@ class Player {
     }
 
     update(dt, { perish, spawn, playAudio }, input) {
-        this.v_x = input.get("horizontal") * Player.SPEED;
-        this.v_y = input.get("vertical") * Player.SPEED;
+        let len = Math.sqrt(Math.pow(input.get("horizontal"), 2) + Math.pow(input.get("vertical"), 2));
+        this.v_x = input.get("horizontal") / (len || 1) * Player.SPEED;
+        this.v_y = input.get("vertical") / (len || 1) * Player.SPEED;
         this.box.x = Math.max(0, Math.min(this.box.x + this.v_x * dt, SCREEN_WIDTH - this.box.w));
         this.box.y = Math.max(0, Math.min(this.box.y + this.v_y * dt, SCREEN_HEIGHT - this.box.h));
 
