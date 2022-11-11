@@ -11,7 +11,6 @@ class Projectile {
         if (!(obj instanceof Projectile) && this.whoFired != obj) {
             if (this.whoFired.score !== undefined)
                 this.whoFired.score += 500;
-            playAudio(Sound.explosion);
             perish();
         }
     }
