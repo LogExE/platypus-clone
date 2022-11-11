@@ -49,8 +49,17 @@ function drawPlaying(objects, textures, ctx) {
             scores.push(obj.score);
             ctx.drawImage(textures.get(Texture.player), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
-        else if (obj instanceof DefaultProjectile) {
+        else if (obj instanceof Powerup) {
+            if (Powerup.STATES[obj.state] == FastProjectile)
+                ctx.drawImage(textures.get(Texture.powerupFast), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+            else if (Powerup.STATES[obj.state] == PulseProjectile)
+                ctx.drawImage(textures.get(Texture.powerupPulse), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+        }
+        else if (obj instanceof DefaultProjectile || obj instanceof FastProjectile) {
             ctx.drawImage(textures.get(Texture.defProjectile), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
+        }
+        else if (obj instanceof PulseProjectile) {
+            ctx.drawImage(textures.get(Texture.pulseProjectile), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         else if (obj instanceof SmallProjectile) {
             ctx.drawImage(textures.get(Texture.smolProjectile), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
@@ -122,6 +131,10 @@ function update(gameManager, dt) {
             gameManager.objects.add(new EnemyUFO(SCREEN_WIDTH, Math.random() * SCREEN_HEIGHT));
             setTimeout(addUFOs, 500 + Math.random() * 5000);
         }, 2500);
+        setTimeout(function addPowerups() {
+            gameManager.objects.add(new Powerup(500, Math.random() * SCREEN_HEIGHT));
+            setTimeout(addPowerups, 30000);
+        }, 0);
     }
     switch (gameManager.state) {
         case "playing":
@@ -166,7 +179,7 @@ async function main() {
     function animate(now) {
         if (!previousTimeStamp)
             previousTimeStamp = now;
-        update(gameManager, (now - previousTimeStamp) * 0.1);
+        update(gameManager, (now - previousTimeStamp) / 1000);
         draw(gameManager, ctx);
         previousTimeStamp = now;
         window.requestAnimationFrame(animate);

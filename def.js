@@ -5,8 +5,11 @@ const SCREEN_WIDTH = 2000, SCREEN_HEIGHT = 1000;
 const Texture = {
     player: 'playerShip',
     defProjectile: 'bullet',
+    pulseProjectile: 'blast',
     smolProjectile: 'projsmall',
-    ufo: 'ufo'
+    ufo: 'ufo',
+    powerupPulse: 'pulsepowerup',
+    powerupFast: 'fastpowerup'
 };
 
 const Sound = {
@@ -14,7 +17,8 @@ const Sound = {
     bigexplosion: 'explosion-big',
     shot: 'shot-1',
     enemyshot: 'laser small',
-    hit: 'dink'
+    hit: 'dink',
+    pulseshot: 'pulse'
 };
 
 const GameSettings = {

@@ -1,25 +1,31 @@
 'use strict';
 
 class Player {
-    static SPEED = 4;
+    static SPEED = 400;
     static WIDTH = 150;
     static HEIGHT = 70;
+    static COOLDOWNS = {
+        [DefaultProjectile]: 0.2,
+        [PulseProjectile]: 0.8,
+        [FastProjectile]: 0.05
+    };
     constructor(x, y) {
         this.v_x = 0;
         this.v_y = 0;
         this.box = new CollisionBox(x, y, Player.WIDTH, Player.HEIGHT);
 
-        this.max_cd = 20;
         this.cd = 0;
 
         this.respawn_timer = 2000;
+        this.current_projectile = DefaultProjectile;
+        this.poweruptimer = 0;
 
         this.score = 0;
         this.lives = 3;
     }
 
     hit(obj, { perish, spawn, playAudio }) {
-        if (!(obj instanceof Player) && !(obj instanceof Projectile && obj.whoFired instanceof Player)) {
+        if (!(obj instanceof Player) && !(obj instanceof Projectile && obj.whoFired instanceof Player) && !(obj instanceof Powerup)) {
             playAudio(Sound.bigexplosion);
             perish();
         }
@@ -34,11 +40,21 @@ class Player {
 
         if (this.cd > 0)
             this.cd = Math.max(this.cd - dt, 0);
-        else if (input.get("space"))
-            if (this.cd == 0) {
-                spawn(new DefaultProjectile(this, this.box.x + this.box.w, this.box.y + this.box.h, 8, 0));
+        else if (input.get("space")) {
+            if (this.current_projectile == DefaultProjectile || this.current_projectile == FastProjectile) {
+                spawn(new DefaultProjectile(this, this.box.x + this.box.w, this.box.y + this.box.h / 2, 800, 0));
                 playAudio(Sound.shot);
-                this.cd = this.max_cd;
             }
+            else if (this.current_projectile == PulseProjectile) {
+                spawn(new PulseProjectile(this, this.box.x + this.box.w, this.box.y + this.box.h / 2, 400, 0));
+                playAudio(Sound.pulseshot);
+            }
+            this.cd = Player.COOLDOWNS[this.current_projectile];
+        }
+        if (this.poweruptimer > 0) {
+            this.poweruptimer = Math.max(this.poweruptimer - dt, 0);
+            if (this.poweruptimer == 0)
+                this.current_projectile = DefaultProjectile;
+        }
     }
 }

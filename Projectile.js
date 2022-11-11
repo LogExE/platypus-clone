@@ -10,7 +10,7 @@ class Projectile {
 
     hit(obj, { perish, spawn, playAudio }) {
         if (!(obj instanceof Projectile) && this.whoFired instanceof Player && !(obj instanceof Player) || !(this.whoFired instanceof Player) && obj instanceof Player) {
-            if (this.whoFired.score !== undefined)
+            if (!(obj instanceof Powerup) && this.whoFired.score !== undefined)
                 this.whoFired.score += 500;
             playAudio(Sound.hit);
             perish();
@@ -36,5 +36,26 @@ class DefaultProjectile extends Projectile {
     constructor(whoFired, x, y, v_x, v_y) {
         super(whoFired, x, y, v_x, v_y)
         this.box = new CollisionBox(x, y, 60, 30);
+    }
+}
+
+class FastProjectile extends DefaultProjectile {
+}
+
+class PulseProjectile extends Projectile {
+    static LIFETIME = 0.5;
+    static GROWTH = 200;
+    constructor(whoFired, x, y, v_x, v_y) {
+        super(whoFired, x, y, v_x, v_y)
+        this.box = new CollisionBox(x, y, 20, 40);
+        this.timer = 0;
+    }
+    update(dt, { perish, spawn, playAudio }) {
+        super.update(dt, { perish, spawn, playAudio });
+        if (this.timer >= PulseProjectile.LIFETIME)
+            perish();
+        this.timer += dt;
+        this.box.h += PulseProjectile.GROWTH * dt;
+        this.box.y -= PulseProjectile.GROWTH / 2 * dt;
     }
 }
