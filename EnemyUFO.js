@@ -7,15 +7,16 @@ class EnemyUFO {
     constructor(x, y) {
         this.v_x = -EnemyUFO.SPEED;
         this.v_y = 0;
-
         this.box = new CollisionBox(x, y, EnemyUFO.WIDTH, EnemyUFO.HEIGHT);
+
         this.max_cd = 200;
         this.cd = 0;
+
         this.timer = 0;
     }
 
     hit(obj, { perish, spawn, playAudio }) {
-        if (obj instanceof Player || obj instanceof Projectile && obj.whoFired != this) {
+        if (obj instanceof Player || obj instanceof Projectile && obj.whoFired instanceof Player) {
             playAudio(Sound.explosion);
             perish();
         }
@@ -26,19 +27,19 @@ class EnemyUFO {
         this.box.x += this.v_x * dt
         this.box.y += this.v_y * dt;
 
-        if (this.box.x + this.box.w < 0)
-        {
+        if (this.box.x + this.box.w < 0) {
             perish();
             return;
         }
 
-        if (this.cd == 0) {
+        if (this.cd > 0)
+            this.cd = Math.max(this.cd - dt, 0);
+        else {
             spawn(new SmallProjectile(this, this.box.x, this.box.y + this.box.h, -4, 0));
             playAudio(Sound.enemyshot);
             this.cd = this.max_cd;
         }
-        if (this.cd > 0)
-            this.cd = Math.max(this.cd - 1 * dt, 0);
-        this.timer += 1 * dt;
+
+        this.timer += dt;
     }
 }

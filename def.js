@@ -13,7 +13,8 @@ const Sound = {
     explosion: 'explosion-small',
     bigexplosion: 'explosion-big',
     shot: 'shot-1',
-    enemyshot: 'laser small'
+    enemyshot: 'laser small',
+    hit: 'dink'
 };
 
 const GameSettings = {

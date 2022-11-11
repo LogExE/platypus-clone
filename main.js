@@ -15,13 +15,22 @@ function playAudio(name) {
     aud.play();
 }
 
-function drawMenu(ctx) {
-    ctx.fillStyle = "#9999f0";
+function drawText(ctx, text, font, color, x, y, align) {
+    ctx.fillStyle = color;
+    ctx.font = font;
+    ctx.textAlign = align;
+    ctx.fillText(text, x, y);
+}
+
+function clear(ctx, color) {
+    ctx.fillStyle = color;
     ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    ctx.fillStyle = "#000000";
-    ctx.font = "30px Georgia";
-    ctx.textAlign = "center";
-    ctx.fillText("Shooter", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
+}
+
+
+function drawMenu(ctx) {
+    clear(ctx, "#9999f0");
+    drawText(ctx, "Shooter", "30px Georgia", "#000000", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3, "center");
 }
 
 function updateMenu(dt) {
@@ -29,8 +38,7 @@ function updateMenu(dt) {
 }
 
 function drawPlaying(objects, textures, ctx) {
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clear(ctx, "#FFFFFF");
     let scores = [];
     for (let obj of objects) {
         if (GameSettings.debug && obj.box) {
@@ -52,16 +60,11 @@ function drawPlaying(objects, textures, ctx) {
         }
         else throw new Error("Tried to draw unknown object!");
     }
-    let x = 10;
+    let text = [];
     for (let score of scores) {
-        ctx.fillStyle = "#000000";
-        ctx.font = "30px Georgia";
-        ctx.textAlign = "left";
-        let text = "Score: " + score + " ";
-        let sz = ctx.measureText(text);
-        ctx.fillText(text, x, sz.actualBoundingBoxAscent + sz.actualBoundingBoxDescent);
-        x += sz.width;
+        text.push(" Score: " + score);
     }
+    drawText(ctx, text.join(';'), "30px Georgia", "#000000", 0, 30, "left");
 }
 
 function updatePlaying(dt, objects, inputHandlers) {
@@ -102,11 +105,12 @@ function draw(gameManager, ctx) {
 function update(gameManager, dt) {
     if (gameManager.state == "menu" && gameManager.inputHandlers.primary.get("enter")) {
         gameManager.state = "playing";
+
         let plr = new Player(10, SCREEN_HEIGHT / 2);
         gameManager.objects.add(plr);
         gameManager.inputHandlers.inputs.set(plr, gameManager.inputHandlers.primary);
         window.addEventListener("gamepadconnected", (e) => {
-            let newplr = new Player(10, SCREEN_HEIGHT / 2);
+            let newplr = new Player(10, SCREEN_HEIGHT / 2 + Math.random() * 500 - 250);
             gameManager.objects.add(newplr);
             gameManager.inputHandlers.inputs.set(newplr, new GamepadInputHandler(e.gamepad.index));
         });
@@ -136,11 +140,11 @@ async function main() {
     let resize = () => {
         canvas.width = document.body.clientWidth;
         canvas.height = document.body.clientHeight;
-	let realw = canvas.width, realh = canvas.height;
-	canvas.width *= window.devicePixelRatio;
-	canvas.height *= window.devicePixelRatio;
-	canvas.style.width = `${realw}px`;
-	canvas.style.height = `${realh}px`;
+        let realw = canvas.width, realh = canvas.height;
+        canvas.width *= window.devicePixelRatio;
+        canvas.height *= window.devicePixelRatio;
+        canvas.style.width = `${realw}px`;
+        canvas.style.height = `${realh}px`;
     };
     resize();
     window.addEventListener("resize", resize);

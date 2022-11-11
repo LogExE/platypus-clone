@@ -4,13 +4,15 @@ class Projectile {
     constructor(whoFired, x, y, v_x, v_y) {
         this.v_x = v_x;
         this.v_y = v_y;
+
         this.whoFired = whoFired;
     }
 
     hit(obj, { perish, spawn, playAudio }) {
-        if (!(obj instanceof Projectile) && this.whoFired != obj) {
+        if (!(obj instanceof Projectile) && this.whoFired instanceof Player && !(obj instanceof Player) || !(this.whoFired instanceof Player) && obj instanceof Player) {
             if (this.whoFired.score !== undefined)
                 this.whoFired.score += 500;
+            playAudio(Sound.hit);
             perish();
         }
     }
