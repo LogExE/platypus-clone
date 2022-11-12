@@ -132,9 +132,9 @@ function update(gameManager, dt) {
             setTimeout(addUFOs, 500 + Math.random() * 5000);
         }, 2500);
         setTimeout(function addPowerups() {
-            gameManager.objects.add(new Powerup(500, Math.random() * SCREEN_HEIGHT));
-            setTimeout(addPowerups, 30000);
-        }, 0);
+            gameManager.objects.add(new Powerup(SCREEN_WIDTH, Math.random() * SCREEN_HEIGHT));
+            setTimeout(addPowerups, 20000);
+        }, 10000);
     }
     switch (gameManager.state) {
         case "playing":

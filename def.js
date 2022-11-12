@@ -18,7 +18,8 @@ const Sound = {
     shot: 'shot-1',
     enemyshot: 'laser small',
     hit: 'dink',
-    pulseshot: 'pulse'
+    pulseshot: 'pulse',
+    pickPowerup: 'bonus'
 };
 
 const GameSettings = {
