@@ -9,7 +9,7 @@ class Projectile {
     }
 
     hit(obj, { perish, spawn, playAudio }) {
-        if (obj instanceof Powerup && obj.timer == 0) {
+        if (obj instanceof Powerup && obj.timer == 0 && this.whoFired instanceof Player) {
             obj.timer = Powerup.SWITCH_TIME;
             playAudio(Sound.hit);
             perish();
