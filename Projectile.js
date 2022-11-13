@@ -53,10 +53,10 @@ class FastProjectile extends DefaultProjectile {
 
 class PulseProjectile extends Projectile {
     static LIFETIME = 0.5;
-    static GROWTH = 400;
+    static GROWTH = 800;
     constructor(whoFired, x, y, v_x, v_y) {
         super(whoFired, x, y, v_x, v_y)
-        this.box = new CollisionBox(x, y, 20, 40);
+        this.box = new CollisionBox(x, y, 30, 40);
         this.timer = 0;
     }
     update(dt, { perish, spawn, playAudio }) {

@@ -1,33 +1,46 @@
 'use strict';
 
 class Player {
-    static SPEED = 400;
+    static SPEED = 600;
     static WIDTH = 150;
     static HEIGHT = 70;
+    static RESPAWN_TIME = 2000;
     static COOLDOWNS = {
         [DefaultProjectile]: 0.2,
         [PulseProjectile]: 0.8,
         [FastProjectile]: 0.05
     };
+
+    appear() {
+        this.active = true;
+    }
+
+    disappear() {
+        this.active = false;
+    }
+
     constructor(x, y) {
         this.v_x = 0;
         this.v_y = 0;
         this.box = new CollisionBox(x, y, Player.WIDTH, Player.HEIGHT);
+        this.active = true;
 
         this.cd = 0;
-
-        this.respawn_timer = 2000;
         this.current_projectile = DefaultProjectile;
-        this.poweruptimer = 0;
 
-        this.score = 0;
+        this.poweruptimer = 0;
         this.lives = 3;
+        this.score = 0;
     }
 
     hit(obj, { perish, spawn, playAudio }) {
         if (!(obj instanceof Player) && !(obj instanceof Projectile && obj.whoFired instanceof Player) && !(obj instanceof Powerup)) {
             playAudio(Sound.bigexplosion);
+            //if (this.lives == 0)
             perish();
+            //else {
+            //--this.lives;
+            //}
         }
     }
 

@@ -29,8 +29,8 @@ function clear(ctx, color) {
 
 
 function drawMenu(ctx) {
-    clear(ctx, "#9999f0");
-    drawText(ctx, "Shooter", "30px Georgia", "#000000", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3, "center");
+    clear(ctx, "#ffffff");
+    drawText(ctx, "Shooter", "bold 50px Georgia", "#000000", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3, "center");
 }
 
 function updateMenu(dt) {
@@ -38,7 +38,7 @@ function updateMenu(dt) {
 }
 
 function drawPlaying(objects, textures, ctx) {
-    clear(ctx, "#FFFFFF");
+    clear(ctx, "#9999f0");
     let scores = [];
     for (let obj of objects) {
         if (GameSettings.debug && obj.box) {

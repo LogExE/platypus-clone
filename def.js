@@ -14,7 +14,7 @@ const Texture = {
 
 const Sound = {
     explosion: 'explosion-small',
-    bigexplosion: 'explosion-big',
+    bigexplosion: 'explosion-med',
     shot: 'shot-1',
     enemyshot: 'laser small',
     hit: 'dink',

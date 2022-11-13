@@ -5,6 +5,7 @@ class EnemyUFO {
     static WIDTH = 120;
     static HEIGHT = 60;
     static COOLDOWN = 2;
+
     constructor(x, y) {
         this.v_x = -EnemyUFO.SPEED;
         this.v_y = 0;
@@ -35,7 +36,7 @@ class EnemyUFO {
         if (this.cd > 0)
             this.cd = Math.max(this.cd - dt, 0);
         else {
-            spawn(new SmallProjectile(this, this.box.x, this.box.y + this.box.h, -400, 0));
+            spawn(new SmallProjectile(this, this.box.x, this.box.y + this.box.h, this.v_x * 1.2, this.v_y * 0.5));
             playAudio(Sound.enemyshot);
             this.cd = EnemyUFO.COOLDOWN;
         }
