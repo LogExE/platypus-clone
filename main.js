@@ -45,6 +45,8 @@ function drawPlaying(objects, textures, ctx) {
     clear(ctx, "#9999f0");
     let plrs = [];
     for (let obj of objects) {
+        if (!obj.active)
+            continue;
         if (GameSettings.debug && obj.box) {
             ctx.fillStyle = '#FF0000';
             ctx.fillRect(obj.box.x, obj.box.y, obj.box.w, obj.box.h);
@@ -75,7 +77,7 @@ function drawPlaying(objects, textures, ctx) {
     }
     let text = [];
     for (let plr of plrs) {
-        let msg = " Score: " + plr.score;
+        let msg = " Score: " + plr.score + " lives: " + plr.lives;
         if (plr.powerupTime > 0)
             msg += " powerup: " + plr.powerupTime;
         text.push(msg);
@@ -86,6 +88,8 @@ function drawPlaying(objects, textures, ctx) {
 function updatePlaying(dt, objects, inputHandlers) {
     let spawn = x => objects.add(x);
     for (let obj of objects) {
+        if (!obj.active)
+            continue;
         let perish = () => objects.delete(obj);
         if (obj instanceof Player) {
             obj.update(dt, { perish, spawn, playAudio }, inputHandlers.inputs.get(obj));
@@ -96,7 +100,7 @@ function updatePlaying(dt, objects, inputHandlers) {
 
     for (let obj1 of objects)
         for (let obj2 of objects)
-            if (obj1 != obj2 && obj1.box.testCol(obj2.box)) {
+            if (obj1.active && obj2.active && obj1 != obj2 && obj1.box.testCol(obj2.box)) {
                 obj1.hit(obj2, { perish: () => objects.delete(obj1), spawn, playAudio });
                 obj2.hit(obj1, { perish: () => objects.delete(obj2), spawn, playAudio });
             }

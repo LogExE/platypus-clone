@@ -10,6 +10,7 @@ class EnemyUFO {
         this.v_x = -EnemyUFO.SPEED;
         this.v_y = 0;
         this.box = new CollisionBox(x, y, EnemyUFO.WIDTH, EnemyUFO.HEIGHT);
+        this.active = true;
 
         this.canFire = true;
         this.timer = 0;

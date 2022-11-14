@@ -63,7 +63,7 @@ class TapInputHandler extends InputHandler {
         let tmp = [...this.touches.values()];
         const centerX = window.innerWidth / 4, centerY = window.innerHeight / 2;
         const rad = Math.min(centerX, centerY);
-        let near = tmp.filter(t => Math.sqrt(Math.pow(t.x - centerX, 2) + Math.pow(t.y - centerY, 2)) <= rad);
+        let near = tmp.filter(t => t.x <= window.innerWidth / 2);
         if (str == "horizontal")
             return near[0] ? (near[0].x - centerX) : 0;
         else if (str == "vertical")

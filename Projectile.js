@@ -4,6 +4,7 @@ class Projectile {
     constructor(whoFired, x, y, v_x, v_y) {
         this.v_x = v_x;
         this.v_y = v_y;
+        this.active = true;
 
         this.whoFired = whoFired;
     }

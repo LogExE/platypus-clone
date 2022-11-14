@@ -10,6 +10,7 @@ class Powerup {
 
     constructor(x, y) {
         this.box = new CollisionBox(x, y, Powerup.WIDTH, Powerup.HEIGHT);
+        this.active = true;
 
         this.bonus = 0;
         this.switching = false;

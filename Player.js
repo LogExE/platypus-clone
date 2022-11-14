@@ -4,7 +4,8 @@ class Player {
     static SPEED = 600;
     static WIDTH = 150;
     static HEIGHT = 70;
-    static RESPAWN_TIME = 2000;
+    static RESPAWN_TIME = 2;
+    //static BLINK_TIME = 2;
     static COOLDOWNS = {
         [DefaultProjectile]: 0.2,
         [PulseProjectile]: 0.8,
@@ -36,11 +37,13 @@ class Player {
     hit(obj, { perish, spawn, playAudio }) {
         if (!(obj instanceof Player) && !(obj instanceof Projectile && obj.whoFired instanceof Player) && !(obj instanceof Powerup)) {
             playAudio(Sound.bigexplosion);
-            //if (this.lives == 0)
-            perish();
-            //else {
-            //--this.lives;
-            //}
+            if (this.lives == 0)
+                perish();
+            else {
+                --this.lives;
+                this.disappear();
+                setTimeout(() => this.appear(), Player.RESPAWN_TIME * 1000);
+            }
         }
     }
 
