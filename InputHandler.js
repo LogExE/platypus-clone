@@ -1,8 +1,5 @@
 
 class InputHandler {
-    constructor() {
-        this.inputs = new Map();
-    }
     get() {
         throw Error("Not implemented");
     }
@@ -11,6 +8,7 @@ class InputHandler {
 class KeyboardInputHandler extends InputHandler {
     constructor() {
         super();
+        this.inputs = new Map();
         window.addEventListener('keydown', ev => this.inputs.set(ev.code, true));
         window.addEventListener('keyup', ev => this.inputs.set(ev.code, false));
     }
@@ -31,16 +29,46 @@ class GamepadInputHandler extends InputHandler {
     get(str) {
         let gamepad = navigator.getGamepads()[this.index];
         let dumbFix = num => Math.floor(num * 10) / 10;
-        this.inputs.set("horizontal", dumbFix(gamepad.axes[GameSettings.gamepadMappings.horizontal]));
-        this.inputs.set("vertical", dumbFix(gamepad.axes[GameSettings.gamepadMappings.vertical]));
-        this.inputs.set("space", gamepad.buttons[GameSettings.gamepadMappings.a].pressed);
-
-        return this.inputs.get(str);
+        if (str == "horizontal")
+            return dumbFix(gamepad.axes[GameSettings.gamepadMappings.horizontal]);
+        else if (str == "vertical")
+            return dumbFix(gamepad.axes[GameSettings.gamepadMappings.vertical]);
+        else if (str == "space")
+            return gamepad.buttons[GameSettings.gamepadMappings.a].pressed;
     }
 }
 
 class TapInputHandler extends InputHandler {
     constructor() {
         super();
+        this.touches = new Map();
+        window.addEventListener('touchstart', ev => {
+            ev.preventDefault();
+            for (let touch of ev.changedTouches)
+                this.touches.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+        }, { passive: false });
+        window.addEventListener('touchmove', ev => {
+            ev.preventDefault();
+            for (let touch of ev.changedTouches)
+                this.touches.set(touch.identifier, { x: touch.clientX, y: touch.clientY });
+        }, { passive: false });
+        window.addEventListener('touchend', ev => {
+            ev.preventDefault();
+            for (let touch of ev.changedTouches)
+                this.touches.delete(touch.identifier);
+        }, { passive: false });
+    }
+
+    get(str) {
+        let tmp = [...this.touches.values()];
+        const centerX = window.innerWidth / 4, centerY = window.innerHeight / 2;
+        const rad = Math.min(centerX, centerY);
+        let near = tmp.filter(t => Math.sqrt(Math.pow(t.x - centerX, 2) + Math.pow(t.y - centerY, 2)) <= rad);
+        if (str == "horizontal")
+            return near[0] ? (near[0].x - centerX) : 0;
+        else if (str == "vertical")
+            return near[0] ? (near[0].y - centerY) : 0;
+        else if (str == "space" || str == "enter")
+            return tmp.some(t => t.x > window.innerWidth / 2);
     }
 }

@@ -1,5 +1,9 @@
 'use strict';
 
+function checkTouch() {
+    return 'ontouchstart' in document.documentElement;
+}
+
 function loadImage(name) {
     let img = new Image();
 
@@ -174,7 +178,7 @@ async function main() {
         inputHandlers: { primary: null, inputs: new Map() },
         state: "menu",
     };
-    let inpHandler = new KeyboardInputHandler();
+    let inpHandler = checkTouch() ? new TapInputHandler() : new KeyboardInputHandler();
     gameManager.inputHandlers.primary = inpHandler;
 
     let txtrs = await Promise.all(Object.values(Texture).map(loadImage));
