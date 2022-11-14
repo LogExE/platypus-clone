@@ -39,20 +39,20 @@ function updateMenu(dt) {
 
 function drawPlaying(objects, textures, ctx) {
     clear(ctx, "#9999f0");
-    let scores = [];
+    let plrs = [];
     for (let obj of objects) {
         if (GameSettings.debug && obj.box) {
             ctx.fillStyle = '#FF0000';
             ctx.fillRect(obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         if (obj instanceof Player) {
-            scores.push(obj.score);
+            plrs.push(obj);
             ctx.drawImage(textures.get(Texture.player), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         else if (obj instanceof Powerup) {
-            if (Powerup.STATES[obj.state] == FastProjectile)
+            if (obj.curBonus() == FastProjectile)
                 ctx.drawImage(textures.get(Texture.powerupFast), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
-            else if (Powerup.STATES[obj.state] == PulseProjectile)
+            else if (obj.curBonus() == PulseProjectile)
                 ctx.drawImage(textures.get(Texture.powerupPulse), obj.box.x, obj.box.y, obj.box.w, obj.box.h);
         }
         else if (obj instanceof DefaultProjectile || obj instanceof FastProjectile) {
@@ -70,8 +70,11 @@ function drawPlaying(objects, textures, ctx) {
         else throw new Error("Tried to draw unknown object!");
     }
     let text = [];
-    for (let score of scores) {
-        text.push(" Score: " + score);
+    for (let plr of plrs) {
+        let msg = " Score: " + plr.score;
+        if (plr.powerupTime > 0)
+            msg += " powerup: " + plr.powerupTime;
+        text.push(msg);
     }
     drawText(ctx, text.join(';'), "30px Georgia", "#000000", 0, 30, "left");
 }
@@ -118,6 +121,9 @@ function update(gameManager, dt) {
         let plr = new Player(10, SCREEN_HEIGHT / 2);
         gameManager.objects.add(plr);
         gameManager.inputHandlers.inputs.set(plr, gameManager.inputHandlers.primary);
+        //cheats huehuehue
+        window.addEventListener("keydown", e => (e.code == 'Digit1') ? gameManager.objects.add(new Powerup(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)) : 42);
+
         window.addEventListener("gamepadconnected", (e) => {
             let newplr = new Player(10, SCREEN_HEIGHT / 2 + Math.random() * 500 - 250);
             gameManager.objects.add(newplr);

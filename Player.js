@@ -25,10 +25,10 @@ class Player {
         this.box = new CollisionBox(x, y, Player.WIDTH, Player.HEIGHT);
         this.active = true;
 
-        this.cd = 0;
+        this.canFire = true;
         this.current_projectile = DefaultProjectile;
+        this.powerupTime = 0;
 
-        this.poweruptimer = 0;
         this.lives = 3;
         this.score = 0;
     }
@@ -51,9 +51,7 @@ class Player {
         this.box.x = Math.max(0, Math.min(this.box.x + this.v_x * dt, SCREEN_WIDTH - this.box.w));
         this.box.y = Math.max(0, Math.min(this.box.y + this.v_y * dt, SCREEN_HEIGHT - this.box.h));
 
-        if (this.cd > 0)
-            this.cd = Math.max(this.cd - dt, 0);
-        else if (input.get("space")) {
+        if (input.get("space") && this.canFire) {
             if (this.current_projectile == DefaultProjectile || this.current_projectile == FastProjectile) {
                 spawn(new DefaultProjectile(this, this.box.x + this.box.w, this.box.y + this.box.h / 2, 800, 0));
                 playAudio(Sound.shot);
@@ -62,12 +60,8 @@ class Player {
                 spawn(new PulseProjectile(this, this.box.x + this.box.w, this.box.y + this.box.h / 2, 400, 0));
                 playAudio(Sound.pulseshot);
             }
-            this.cd = Player.COOLDOWNS[this.current_projectile];
-        }
-        if (this.poweruptimer > 0) {
-            this.poweruptimer = Math.max(this.poweruptimer - dt, 0);
-            if (this.poweruptimer == 0)
-                this.current_projectile = DefaultProjectile;
+            this.canFire = false;
+            setTimeout(() => this.canFire = true, Player.COOLDOWNS[this.current_projectile] * 1000);
         }
     }
 }

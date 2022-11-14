@@ -11,8 +11,7 @@ class EnemyUFO {
         this.v_y = 0;
         this.box = new CollisionBox(x, y, EnemyUFO.WIDTH, EnemyUFO.HEIGHT);
 
-        this.cd = 0;
-
+        this.canFire = true;
         this.timer = 0;
     }
 
@@ -33,12 +32,11 @@ class EnemyUFO {
             return;
         }
 
-        if (this.cd > 0)
-            this.cd = Math.max(this.cd - dt, 0);
-        else {
+        if (this.canFire) {
             spawn(new SmallProjectile(this, this.box.x, this.box.y + this.box.h, this.v_x * 1.2, this.v_y * 0.5));
             playAudio(Sound.enemyshot);
-            this.cd = EnemyUFO.COOLDOWN;
+            this.canFire = false;
+            setTimeout(() => this.canFire = true, EnemyUFO.COOLDOWN * 1000);
         }
 
         this.timer += dt;
